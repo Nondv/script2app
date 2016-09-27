@@ -11,6 +11,7 @@ class Package
     raise 'Package invalid' unless valid?
 
     prepare_directories
+    write_info_plist
     add_executable
     @generated = true
   end
@@ -58,6 +59,33 @@ class Package
     executable_path = "#{path}/Contents/MacOS/#{appname}"
     `cp #{@path_to_script} #{executable_path}`
     `chmod +x #{executable_path}`
+  end
+
+  def write_info_plist
+    File.open("#{path}/Contents/Info.plist", 'w') do |f|
+      f.write <<CONTENT
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>script2app.#{appname}</string>
+
+  <key>CFBundleExecutable</key>
+  <string>#{appname}</string>
+
+
+  <key>CFBundleName</key>
+  <string>#{appname}</string>
+
+  <key>CFBundleVersion</key>
+  <string>1</string>
+</dict>
+</plist>
+
+CONTENT
+    end
   end
 end
 
